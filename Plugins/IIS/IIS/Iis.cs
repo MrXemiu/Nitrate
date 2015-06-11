@@ -13,16 +13,13 @@ namespace Nitrate.Plugins.Iis
 
   public class IisConfig
   {
-    public string ClrVersion { get; set; }
     public string Site { get; set; }
-    public int Port { get; set; }
     public string Path { get; set; }
     public string Name { get; set; }
 
     public IisConfig()
     {
       Site = "Default Web Site";
-      Port = 8080;
       Name = "Orchard";
       Path = @"orchard\src\Orchard.Web";
     }
@@ -81,9 +78,7 @@ namespace Nitrate.Plugins.Iis
         {
           "Orchard", new IisConfig
           {
-            ClrVersion = "v4.0", 
             Site = "Default Web Site", 
-            Port = 8080, 
             Name = "Orchard", 
             Path = @"orchard\src\Orchard.Web"
           }
