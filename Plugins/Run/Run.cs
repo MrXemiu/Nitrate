@@ -29,7 +29,8 @@ namespace Nitrate.Plugins.Run
 							"msbuild",
 							"sqlserver create -f",
 							"orchard setup",
-							"iisexpress start"
+							"iisexpress start",
+                            "iis configure"
 						}
 					}
 				}
