@@ -66,7 +66,16 @@ namespace Nitrate
 					Shell.Error("Init command not available: you are already in a Nitrate project.");
 				else
 				{
-					PluginManager.Run(command, args.Skip(1).ToArray());
+                    try
+                    {
+                        PluginManager.Run(command, args.Skip(1).ToArray());
+                    }
+                    catch (Exception ex)
+                    {
+                        Shell.Write(ex.ToString(), true, ConsoleColor.Red);
+                        Shell.Write("Press ENTER to continue.");
+                        Shell.Read();
+                    }
 				}
 			}
 

@@ -23,6 +23,16 @@ namespace Nitrate
 			Console.ResetColor();
 		}
 
+	    public static string Read()
+	    {
+	         return Convert.ToChar(Console.Read()).ToString();
+	    }
+
+	    public static string ReadLine()
+	    {
+	        return Console.ReadLine();
+	    }
+
 		public static void Error(string message, bool newLine = true)
 		{
 			Write(message, newLine, ConsoleColor.Red);
