@@ -163,7 +163,7 @@ namespace Nitrate.Plugins.Iis
 			var dirSecurity = dirInfo.GetAccessControl();
 
 			dirSecurity.AddAccessRule(
-				new FileSystemAccessRule(identity, FileSystemRights.Modify, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+				new FileSystemAccessRule(identity, FileSystemRights.Modify, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.InheritOnly, AccessControlType.Allow));
 
 			dirInfo.SetAccessControl(dirSecurity);
 		}
