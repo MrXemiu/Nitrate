@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.ServiceProcess;
 using System.Text;
 using Microsoft.Web.Administration;
@@ -143,10 +144,31 @@ namespace Nitrate.Plugins.Iis
             var app = localWebSite.Applications[relativeAppPath];
             if (app == null && createIfNeeded)
                 app = CreateNewApplication(config, serverManager, localWebSite);
+
+	        EnsureAppPoolFolderPermissions(serverManager, app);
+
             return app;
         }
 
-        private static Application CreateNewApplication(IisConfig config, ServerManager serverManager, Site localWebSite)
+	    private static void EnsureAppPoolFolderPermissions(ServerManager serverManager, Application app)
+	    {
+		    var appPoolProcModel = serverManager.ApplicationPools[app.ApplicationPoolName].ProcessModel;
+
+			var identity = appPoolProcModel.IdentityType == ProcessModelIdentityType.ApplicationPoolIdentity
+				? string.Format("IIS AppPool\\{0}", app.ApplicationPoolName)
+				: appPoolProcModel.UserName;
+
+			var dirInfo = new DirectoryInfo(Config.Current.Path);
+
+			var dirSecurity = dirInfo.GetAccessControl();
+
+			dirSecurity.AddAccessRule(
+				new FileSystemAccessRule(identity, FileSystemRights.Modify, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+
+			dirInfo.SetAccessControl(dirSecurity);
+		}
+
+		private static Application CreateNewApplication(IisConfig config, ServerManager serverManager, Site localWebSite)
         {
             var appPath = GetPhysicalApplicationPath(config);
 
