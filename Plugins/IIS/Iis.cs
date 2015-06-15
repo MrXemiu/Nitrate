@@ -95,7 +95,7 @@ namespace Nitrate.Plugins.Iis
             service.WaitForStatus(ServiceControllerStatus.Stopped, timeOutDurationMs);
 
             var startTimeMs = Environment.TickCount;
-            timeOutDurationMs = TimeSpan.FromMilliseconds(TimeOutMs - (startTimeMs - stopTimetMs));
+			timeOutDurationMs = TimeSpan.FromMilliseconds(TimeOutMs - (stopTimetMs - startTimeMs));
 
             service.Start();
             service.WaitForStatus(ServiceControllerStatus.Running, timeOutDurationMs);
