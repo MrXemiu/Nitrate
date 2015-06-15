@@ -117,16 +117,21 @@ namespace Nitrate.Plugins.SqlServer
         public override void Execute(string configName, SqlServerConfig config, string subCommand, Dictionary<string, string> args)
         {
             Server server;
-            if (string.IsNullOrWhiteSpace(config.Server))
-                server = new Server();
-            else if (SqlServerAuthProvided(config))
-            {
-                var sqlConnection = new SqlConnectionInfo(config.Server, config.DbUser, config.DbPass);
-                var serverConnection = new ServerConnection(sqlConnection);
-                server = new Server(serverConnection);
-            }
-            else
-                server = new Server(config.Server);
+	        if (string.IsNullOrWhiteSpace(config.Server))
+		        server = new Server();
+			else
+			{
+				//try to connect with integrated auth
+				server = new Server(config.Server);
+
+				//if integrated auth won't work, try sql auth
+				if (MustConnectWithSqlServerAuth(config, server))
+				{
+					var sqlConnection = new SqlConnectionInfo(config.Server, config.DbUser, config.DbPass);
+					var serverConnection = new ServerConnection(sqlConnection);
+					server = new Server(serverConnection);
+				}
+			}
 
             switch (subCommand)
             {
@@ -145,7 +150,18 @@ namespace Nitrate.Plugins.SqlServer
             }
         }
 
-        private static bool SqlServerAuthProvided(SqlServerConfig config)
+		/// <summary>
+		/// Determines if a server connection should be established with sql server authentication instead of integrated authentication.
+		/// </summary>
+		/// <param name="config"></param>
+		/// <param name="server"></param>
+		/// <returns>True if the current server ConnectionContext.InUse is false and sql server credentials were provided in the config</returns>
+	    private static bool MustConnectWithSqlServerAuth(SqlServerConfig config, Server server)
+	    {
+		    return !server.ConnectionContext.InUse && SqlServerAuthProvided(config);
+	    }
+
+	    private static bool SqlServerAuthProvided(SqlServerConfig config)
         {
             return !string.IsNullOrWhiteSpace(config.DbUser) && !string.IsNullOrWhiteSpace(config.DbPass);
         }
